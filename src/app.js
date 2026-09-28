@@ -91,12 +91,31 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.get('/api/health', (_req, res) => res.json({
-  status: 'ok',
-  supabaseConfigured: Boolean(config.supabaseUrl && config.supabaseServiceRoleKey),
-  authSchema: config.supabaseAuthSchema,
-  maintenanceSchema: config.supabaseMaintenanceSchema
-}));
+app.get('/api/health', async (_req, res) => {
+  const result = {
+    status: 'ok',
+    supabaseConfigured: Boolean(config.supabaseUrl && config.supabaseServiceRoleKey),
+    authSchema: config.supabaseAuthSchema,
+    maintenanceSchema: config.supabaseMaintenanceSchema
+  };
+
+  if (result.supabaseConfigured) {
+    const headers = {
+      apikey: config.supabaseServiceRoleKey,
+      Authorization: `Bearer ${config.supabaseServiceRoleKey}`,
+      'Accept-Profile': config.supabaseAuthSchema
+    };
+    try {
+      const users = await fetch(new URL('/rest/v1/usuarios?select=id&limit=1', config.supabaseUrl), { headers });
+      const roles = await fetch(new URL('/rest/v1/roles?select=id&limit=1', config.supabaseUrl), { headers });
+      result.supabaseTables = { usuarios: users.status, roles: roles.status };
+    } catch {
+      result.supabaseTables = { usuarios: 'fetch_failed', roles: 'fetch_failed' };
+    }
+  }
+
+  return res.json(result);
+});
 
 app.post('/api/auth/login', async (req, res) => {
   const parsed = credentialsSchema.safeParse(req.body);
