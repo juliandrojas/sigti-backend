@@ -20,6 +20,8 @@ export const config = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '8h',
   supabaseUrl: process.env.SUPABASE_URL,
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
-  supabaseAuthSchema: process.env.SUPABASE_AUTH_SCHEMA ?? 'public',
-  supabaseMaintenanceSchema: process.env.SUPABASE_MAINTENANCE_SCHEMA ?? 'public'
+  // Las migraciones de SIGTI se ejecutan en el esquema `test`. Las variables
+  // de entorno siguen permitiendo cambiarlo explícitamente en otro ambiente.
+  supabaseAuthSchema: process.env.SUPABASE_AUTH_SCHEMA ?? 'test',
+  supabaseMaintenanceSchema: process.env.SUPABASE_MAINTENANCE_SCHEMA ?? 'test'
 };
