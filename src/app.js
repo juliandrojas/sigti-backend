@@ -91,7 +91,12 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/api/health', (_req, res) => res.json({
+  status: 'ok',
+  supabaseConfigured: Boolean(config.supabaseUrl && config.supabaseServiceRoleKey),
+  authSchema: config.supabaseAuthSchema,
+  maintenanceSchema: config.supabaseMaintenanceSchema
+}));
 
 app.post('/api/auth/login', async (req, res) => {
   const parsed = credentialsSchema.safeParse(req.body);
