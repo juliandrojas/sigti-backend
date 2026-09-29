@@ -136,7 +136,12 @@ app.get('/api/users/:id/equipment', requireAuth, async (req, res) => {
     listActiveAssignments()
   ]);
   const userName = [user.name, user.lastname].filter(Boolean).join(' ').trim().toLocaleLowerCase('es-CO');
-  const equipment = maintenances.filter((item) => String(item.responsible ?? '').trim().toLocaleLowerCase('es-CO') === userName);
+  const equipment = await Promise.all(maintenances
+    .filter((item) => String(item.responsible ?? '').trim().toLocaleLowerCase('es-CO') === userName)
+    .map(async (item) => ({
+      ...item,
+      peripherals: await listEquipmentPeripheralCounts(item.id)
+    })));
   const activeAssignments = assignments.filter((item) => String(item.employee_id) === userId);
 
   return res.json({
