@@ -10,6 +10,7 @@ import { createMaintenance, createMaintenanceRecord, listMaintenanceHistory, lis
 import { createAssignment, createPeripheralStock, getActiveAssignmentByEquipment, listActiveAssignments, listAssignmentOptions, listPeripheralStock, returnAssignment } from './loans.js';
 import { listEquipmentPeripheralCounts, listPhysicalPeripheralSummary, saveEquipmentPeripheralCounts } from './peripherals.js';
 import { normalizeArea } from './areas.js';
+import { createTicket, listTickets } from './tickets.js';
 
 const credentialsSchema = z.object({
   username: z.string().trim().min(3, 'El nombre de usuario debe tener al menos 3 caracteres.'),
@@ -82,6 +83,12 @@ const physicalPeripheralSchema = z.object({
   notes: z.string().trim().max(5000).optional().default('')
 });
 
+const ticketSchema = z.object({
+  title: z.string().trim().min(3, 'Indica el motivo de la solicitud.').max(255),
+  description: z.string().trim().max(5000).optional().default(''),
+  priority: z.enum(['low', 'medium', 'high', 'critical']).default('medium')
+});
+
 export const app = express();
 
 app.use(cors({
@@ -149,6 +156,18 @@ app.get('/api/users/:id/equipment', requireAuth, async (req, res) => {
     equipment,
     assignments: activeAssignments
   });
+});
+
+app.get('/api/tickets', requireAuth, async (req, res) => {
+  const tickets = await listTickets(req.auth.role === 'SISTEMAS' ? null : req.auth.sub);
+  return res.json({ tickets });
+});
+
+app.post('/api/tickets', requireAuth, async (req, res) => {
+  const parsed = ticketSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ message: parsed.error.issues[0].message });
+  const ticket = await createTicket({ userId: req.auth.sub, ...parsed.data });
+  return res.status(201).json({ ticket });
 });
 
 app.get('/api/dashboard/systems', requireAuth, async (req, res) => {
