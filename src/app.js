@@ -122,6 +122,30 @@ app.get('/api/users', requireAuth, async (req, res) => {
   return res.json({ users: await listUsers() });
 });
 
+app.get('/api/users/:id/equipment', requireAuth, async (req, res) => {
+  const userId = String(req.params.id);
+  if (req.auth.role !== 'SISTEMAS' && String(req.auth.sub) !== userId) {
+    return res.status(403).json({ message: 'Solo puedes consultar los equipos asignados a tu propio usuario.' });
+  }
+
+  const user = await findUserById(userId);
+  if (!user) return res.status(404).json({ message: 'Usuario no encontrado.' });
+
+  const [maintenances, assignments] = await Promise.all([
+    listMaintenances(),
+    listActiveAssignments()
+  ]);
+  const userName = [user.name, user.lastname].filter(Boolean).join(' ').trim().toLocaleLowerCase('es-CO');
+  const equipment = maintenances.filter((item) => String(item.responsible ?? '').trim().toLocaleLowerCase('es-CO') === userName);
+  const activeAssignments = assignments.filter((item) => String(item.employee_id) === userId);
+
+  return res.json({
+    user: publicUser(user),
+    equipment,
+    assignments: activeAssignments
+  });
+});
+
 app.get('/api/dashboard/systems', requireAuth, async (req, res) => {
   if (req.auth.role !== 'SISTEMAS') {
     return res.status(403).json({ message: 'No tienes acceso a las métricas de Sistemas.' });
