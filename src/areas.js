@@ -1,5 +1,7 @@
 const AREA_ALIASES = new Map([
-  ['bienestar', 'BIENESTAR']
+  ['bienestar', 'BIENESTAR'],
+  ['rrhh', 'RECURSOS HUMANOS'],
+  ['recursos humanos', 'RECURSOS HUMANOS']
 ]);
 
 export function normalizeArea(value) {
