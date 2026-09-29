@@ -1,9 +1,10 @@
 const AREA_ALIASES = new Map([
-  ['bienestar', 'Bienestar']
+  ['bienestar', 'BIENESTAR']
 ]);
 
 export function normalizeArea(value) {
   const trimmed = String(value ?? '').trim().replace(/\s+/g, ' ');
-  if (!trimmed) return 'Área no definida';
-  return AREA_ALIASES.get(trimmed.toLocaleLowerCase('es-CO')) ?? trimmed;
+  if (!trimmed) return 'ÁREA NO DEFINIDA';
+  const normalized = AREA_ALIASES.get(trimmed.toLocaleLowerCase('es-CO')) ?? trimmed;
+  return normalized.toLocaleUpperCase('es-CO');
 }
