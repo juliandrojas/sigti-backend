@@ -1,4 +1,5 @@
 import { config } from './config.js';
+import { normalizeArea } from './areas.js';
 
 function headers(method, prefer) {
   const result = {
@@ -29,10 +30,10 @@ export async function listPhysicalPeripheralSummary() {
     request('equipment_peripheral_counts', { parameters: { select: 'equipment_id,item_type,quantity' } }),
     request('maintenances', { parameters: { select: 'id,area' } })
   ]);
-  const areaByEquipment = new Map(equipment.map((item) => [String(item.id), item.area || 'Área no definida']));
+  const areaByEquipment = new Map(equipment.map((item) => [String(item.id), normalizeArea(item.area)]));
   const byArea = new Map();
   for (const count of counts) {
-    const area = areaByEquipment.get(String(count.equipment_id)) ?? 'Área no definida';
+    const area = areaByEquipment.get(String(count.equipment_id)) ?? normalizeArea();
     const current = byArea.get(area) ?? { area, total: 0, quantities: {} };
     current.total += count.quantity;
     current.quantities[count.item_type] = (current.quantities[count.item_type] ?? 0) + count.quantity;

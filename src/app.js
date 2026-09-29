@@ -9,6 +9,7 @@ import { getSystemMetrics } from './dashboard.js';
 import { createMaintenance, createMaintenanceRecord, listMaintenanceHistory, listMaintenanceRecords, listMaintenances, listSites, updateMaintenance, updateMaintenanceResponsible } from './maintenances.js';
 import { createAssignment, createPeripheralStock, getActiveAssignmentByEquipment, listActiveAssignments, listAssignmentOptions, listPeripheralStock, returnAssignment } from './loans.js';
 import { listEquipmentPeripheralCounts, listPhysicalPeripheralSummary, saveEquipmentPeripheralCounts } from './peripherals.js';
+import { normalizeArea } from './areas.js';
 
 const credentialsSchema = z.object({
   username: z.string().trim().min(3, 'El nombre de usuario debe tener al menos 3 caracteres.'),
@@ -269,7 +270,7 @@ app.patch('/api/maintenances/:id', requireAuth, async (req, res) => {
     equipment_code: parsed.data.equipmentCode,
     full_equipment_code: fullEquipmentCode,
     ip_address: parsed.data.ipAddress || null,
-    area: parsed.data.area,
+    area: normalizeArea(parsed.data.area),
     responsible: parsed.data.responsible,
     brand: parsed.data.brand,
     model: parsed.data.model,
@@ -354,7 +355,7 @@ const saveMaintenance = async (req, res) => {
     equipment_code: parsed.data.equipmentCode,
     full_equipment_code: fullEquipmentCode,
     ip_address: parsed.data.ipAddress || null,
-    area: parsed.data.area,
+    area: normalizeArea(parsed.data.area),
     responsible: parsed.data.responsible,
     brand: parsed.data.brand,
     model: parsed.data.model,
