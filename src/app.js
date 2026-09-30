@@ -49,7 +49,7 @@ const maintenanceRecordSchema = z.object({
 });
 
 const peripheralStockSchema = z.object({
-  itemType: z.enum(['mouse', 'keyboard', 'charge', 'cooling_base']),
+  itemType: z.enum(['mouse', 'keyboard', 'charge', 'cooling_base', 'mouse_pad']),
   brand: z.string().trim().max(100).optional().default(''),
   reference: z.string().trim().max(150).optional().default(''),
   model: z.string().trim().max(150).optional().default(''),
@@ -77,9 +77,9 @@ const assignmentSchema = z.object({
 
 const physicalPeripheralSchema = z.object({
   items: z.array(z.object({
-    itemType: z.enum(['mouse', 'keyboard', 'charge', 'cooling_base']),
+    itemType: z.enum(['mouse', 'keyboard', 'charge', 'cooling_base', 'mouse_pad']),
     quantity: z.number().int().nonnegative()
-  })).length(4),
+  })).length(5),
   notes: z.string().trim().max(5000).optional().default('')
 });
 
