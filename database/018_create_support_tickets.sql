@@ -17,4 +17,7 @@ CREATE TABLE IF NOT EXISTS test.tickets (
 CREATE INDEX IF NOT EXISTS idx_test_tickets_user_id ON test.tickets(user_id);
 CREATE INDEX IF NOT EXISTS idx_test_tickets_status ON test.tickets(status);
 
+GRANT SELECT, INSERT, UPDATE, DELETE ON test.tickets TO service_role;
+GRANT USAGE, SELECT ON SEQUENCE test.tickets_id_seq TO service_role;
+
 COMMIT;
